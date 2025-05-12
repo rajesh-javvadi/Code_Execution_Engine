@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -103,6 +103,7 @@ namespace Executors.Sandbox
             "python" => "code-runner-python",
             "cpp" => "code-runner-cpp",
             "java" => "code-runner-java",
+            "csharp" =>  "code-runner-csharp",
             _ => throw new Exception($"Unsupported language: {language}")
         };
 
@@ -111,6 +112,7 @@ namespace Executors.Sandbox
             "python" => "main.py",
             "cpp" => "main.cpp",
             "java" => "Main.java",
+            "csharp" => "Main.cs",
             _ => throw new Exception($"Unsupported language: {language}")
         };
     }
