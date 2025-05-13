@@ -1,9 +1,6 @@
 FROM openjdk:17-slim
-
 RUN useradd -m runner
 WORKDIR /home/runner
-COPY run.sh .
-RUN chmod +x run.sh
-
+WORKDIR /app
 USER runner
-CMD ["./run.sh"]
+CMD javac Main.java && java Main < input.txt

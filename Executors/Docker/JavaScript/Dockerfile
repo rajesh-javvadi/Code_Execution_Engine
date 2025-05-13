@@ -1,6 +1,6 @@
-FROM python:latest
+FROM node:latest
 RUN useradd -m runner
 WORKDIR /home/runner
 WORKDIR /app
 USER runner
-CMD python3 main.py < input.txt
+CMD node Main.js < input.txt

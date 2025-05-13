@@ -1,6 +1,6 @@
-FROM python:latest
+FROM gcc:latest
 RUN useradd -m runner
 WORKDIR /home/runner
 WORKDIR /app
 USER runner
-CMD python3 main.py < input.txt
+CMD gcc -o main Main.c && ./main < input.txt

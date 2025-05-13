@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <Folder Include="Docker\Java\" />
+    <Folder Include="Docker\Csharp\" />
+    <Folder Include="Docker\JavaScript\" />
     <Folder Include="Docker\Python\" />
   </ItemGroup>
 

@@ -28,7 +28,6 @@ namespace Executors.Sandbox
             var language = request.Language.ToLower();
             var sourceFileName = GetSourceFileName(language);
             var inputFileName = "input.txt";
-            var outputFileName = "output.txt";
 
             var sourceFilePath = Path.Combine(tempDir, sourceFileName);
             var inputFilePath = Path.Combine(tempDir, inputFileName);
@@ -37,16 +36,15 @@ namespace Executors.Sandbox
             {
                 await File.WriteAllTextAsync(sourceFilePath, request.Code ?? "");
                 await File.WriteAllTextAsync(inputFilePath, request.Input ?? "");
-                Console.WriteLine($"[DEBUG] Written files to: {tempDir}");
-                Console.WriteLine($"main.py exists: {File.Exists(sourceFilePath)}");
-                Console.WriteLine($"input.txt exists: {File.Exists(inputFilePath)}");
 
                 var imageName = GetDockerImage(language);
+
+                var containerName = $"code_exec_{Guid.NewGuid().ToString().Replace("-", "")}";
 
                 var processInfo = new ProcessStartInfo
                 {
                     FileName = "docker",
-                    Arguments = $"run --rm -v \"{ConvertToDockerPath(tempDir)}:/app\" {imageName}",
+                    Arguments = $"run --rm --name {containerName} -v \"{ConvertToDockerPath(tempDir)}:/app\" {imageName}",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -58,10 +56,46 @@ namespace Executors.Sandbox
                 using var process = new Process { StartInfo = processInfo };
                 process.Start();
 
+                // Wait for exit with 5 seconds timeout
+                bool exited = process.WaitForExit(5000);
+                if (!exited)
+                {
+                    try
+                    {
+                        // Kill the docker CLI process
+                        process.Kill();
+                    }
+                    catch { /* ignore exceptions on kill */ }
+
+                    try
+                    {
+                        // Stop the running container
+                        var stopProcessInfo = new ProcessStartInfo
+                        {
+                            FileName = "docker",
+                            Arguments = $"stop {containerName}",
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+                        using var stopProcess = new Process { StartInfo = stopProcessInfo };
+                        stopProcess.Start();
+                        stopProcess.WaitForExit();
+                    }
+                    catch { /* ignore exceptions on stop */ }
+
+                    return new CodeExecutionResponse
+                    {
+                        Output = "",
+                        Error = "Time limit exceeded",
+                        ExitCode = -1,
+                        Success = false
+                    };
+                }
+
                 string stdout = await process.StandardOutput.ReadToEndAsync();
                 string stderr = await process.StandardError.ReadToEndAsync();
-
-                process.WaitForExit();
 
                 return new CodeExecutionResponse
                 {
@@ -103,6 +137,9 @@ namespace Executors.Sandbox
             "python" => "code-runner-python",
             "cpp" => "code-runner-cpp",
             "java" => "code-runner-java",
+            "csharp" => "code-runner-csharp",
+            "javascript" => "code-runner-js",
+            "c" => "code-runner-c",
             _ => throw new Exception($"Unsupported language: {language}")
         };
 
@@ -111,6 +148,9 @@ namespace Executors.Sandbox
             "python" => "main.py",
             "cpp" => "main.cpp",
             "java" => "Main.java",
+            "csharp" => "Main.cs",
+            "javascript" => "main.js",
+            "c" => "main.c",
             _ => throw new Exception($"Unsupported language: {language}")
         };
     }
