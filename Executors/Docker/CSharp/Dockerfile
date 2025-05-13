@@ -1,11 +1,6 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:7.0
-
+FROM  mono:latest
 RUN useradd -m runner
 WORKDIR /home/runner
-COPY run.sh .
-RUN chmod +x run.sh
-
+WORKDIR /app
 USER runner
-CMD ["./run.sh"]
-
-
+CMD mcs -out:main.exe Main.cs > /dev/null 2>&1 && mono main.exe < input.txt
