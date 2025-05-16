@@ -1,5 +1,6 @@
 using Core.Interfaces;
 using Executors.Sandbox;
+using Executors.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddScoped<ICodeExecutor, DockerCodeExecutor>();
+builder.Services.AddScoped<ITestCaseExecutor, TestCaseExecutor>();
+builder.Services.AddScoped<TestCaseExecutionQueue>();
+builder.Services.AddScoped<TestCaseExecutionWorker>();
 
 builder.Services.AddCors(options =>
 {

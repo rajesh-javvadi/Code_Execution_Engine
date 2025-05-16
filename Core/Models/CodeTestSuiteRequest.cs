@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Core.Models
 {
-    public class CodeExecutionRequest
+    public class CodeTestSuiteRequest
     {
-        public int? id { get; set; }
-        public string Language { get; set; }
         public string Code { get; set; }
-        public string Input { get; set; }
+        public string Language { get; set; }
+        public List<TestCase> TestCases { get; set; }
     }
+
 }

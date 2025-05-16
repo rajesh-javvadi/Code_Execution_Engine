@@ -50,8 +50,6 @@ namespace Executors.Sandbox
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
-                var dockerPath = ConvertToDockerPath(tempDir);
-                Console.WriteLine($"[DEBUG] Docker mount path: {dockerPath}");
 
                 using var process = new Process { StartInfo = processInfo };
                 process.Start();

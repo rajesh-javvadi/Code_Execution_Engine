@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Executors\Executors.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TempExecutions\" />
+  </ItemGroup>
+
 </Project>

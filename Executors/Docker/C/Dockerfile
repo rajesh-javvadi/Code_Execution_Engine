@@ -1,6 +1,5 @@
-FROM gcc:latest
-RUN useradd -m runner
+FROM alpine:latest
+RUN apk update && apk add --no-cache build-base gcc
 WORKDIR /home/runner
 WORKDIR /app
-USER runner
 CMD gcc -o main Main.c && ./main < input.txt
