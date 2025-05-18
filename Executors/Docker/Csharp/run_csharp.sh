@@ -1,13 +1,19 @@
 #!/bin/bash
 
 # Copy input files
-if ! cp /app/main.py /runner/main.py; then
-  echo "{\"error\": \"/app/main.py not found\"}"
+if ! cp /app/Main.cs /runner/Main.cs; then
+  echo "{\"error\": \"/app/Main.cs not found\"}"
   exit 1
 fi
 
 if ! cp /app/test_cases.json /runner/test_cases.json; then
   echo "{\"error\": \"/app/test_cases.json not found\"}"
+  exit 1
+fi
+
+# Compile with Mono C# compiler (mcs)
+if ! mcs -out:/runner/Main.exe /runner/Main.cs; then
+  echo "{\"error\": \"Failed to compile C# program\"}"
   exit 1
 fi
 
@@ -30,7 +36,12 @@ for (( i=0; i<$count; i++ )); do
     continue
   fi
 
-  output=$(echo "$input" | timeout 5s python3 /runner/main.py 2>&1 || true)
+  # Run the compiled executable directly
+  output=$(echo "$input" | timeout 5s mono /runner/Main.exe 2>&1 || true)
+
+  # Normalize output (remove Windows line endings if any)
+  output=$(echo "$output" | sed 's/\r$//')
+  expected=$(echo "$expected" | sed 's/\r$//')
 
   if [[ "$output" == "$expected" ]]; then
     ((pass_count++))

@@ -1,13 +1,18 @@
 #!/bin/bash
 
-# Copy input files
-if ! cp /app/main.py /runner/main.py; then
-  echo "{\"error\": \"/app/main.py not found\"}"
+if ! cp /app/main.c /runner/main.c; then
+  echo "{\"error\": \"/app/main.c not found\"}"
   exit 1
 fi
 
 if ! cp /app/test_cases.json /runner/test_cases.json; then
   echo "{\"error\": \"/app/test_cases.json not found\"}"
+  exit 1
+fi
+
+# Compile C program
+if ! gcc -o /runner/main /runner/main.c; then
+  echo "{\"error\": \"Failed to compile C program\"}"
   exit 1
 fi
 
@@ -30,7 +35,12 @@ for (( i=0; i<$count; i++ )); do
     continue
   fi
 
-  output=$(echo "$input" | timeout 5s python3 /runner/main.py 2>&1 || true)
+  output=$(echo "$input" | timeout 5s /runner/main 2>&1)
+  exit_code=$?
+
+  if [[ $exit_code -eq 124 ]]; then
+    output="Timeout after 5 seconds"
+  fi
 
   if [[ "$output" == "$expected" ]]; then
     ((pass_count++))
@@ -39,5 +49,4 @@ for (( i=0; i<$count; i++ )); do
   fi
 done
 
-# Output result as valid JSON
 echo "{\"passed\": $pass_count, \"failed\": $fail_count}"

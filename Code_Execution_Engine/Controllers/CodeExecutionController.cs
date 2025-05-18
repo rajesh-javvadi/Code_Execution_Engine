@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Core.Interfaces;
 using Core.Models;
+using System.Text.Json;
+using Executors.Sandbox;
 
 namespace Code_Execution_Engine.Controllers
 {
@@ -9,9 +11,9 @@ namespace Code_Execution_Engine.Controllers
     public class CodeExecutionController : ControllerBase
     {
         private readonly ICodeExecutor _codeExecutor;
-        private readonly ITestCaseExecutor _testCaseExecutor;
+        private readonly ITestCasesExecutor _testCaseExecutor;
 
-        public CodeExecutionController(ICodeExecutor codeExecutor, ITestCaseExecutor testCaseExecutor)
+        public CodeExecutionController(ICodeExecutor codeExecutor, ITestCasesExecutor testCaseExecutor)
         {
             _codeExecutor = codeExecutor;
             _testCaseExecutor = testCaseExecutor;
@@ -59,7 +61,10 @@ namespace Code_Execution_Engine.Controllers
                 testCases.Add(new TestCase { Input = "4 5" ,ExpectedOutput = "9" });
                 testCases.Add(new TestCase { Input = "5 5" ,ExpectedOutput = "10" });
                 testCases.Add(new TestCase { Input = "6 5" ,ExpectedOutput = "11"});
-                var queueId = await _testCaseExecutor.ExecuteTestCases(request, testCases);
+                string json = JsonSerializer.Serialize(testCases, new JsonSerializerOptions { WriteIndented = true });
+                Console.WriteLine(json);
+
+                var queueId = await _testCaseExecutor.ExecuteCodeAsync(request, json);
                 return Ok(queueId);
             }
             catch (Exception ex)
@@ -74,28 +79,28 @@ namespace Code_Execution_Engine.Controllers
             }
         }
 
-        [HttpGet("execute/testCases/{queueId}")]
-        public async Task<ActionResult<TestSuiteExecutionResult>> GetTestCaseExecutionResult(Guid queueId)
-        {
-            try
-            {
-                var result = await _testCaseExecutor.GetTestCaseExecutionResult(queueId);
-                if (result == null)
-                {
-                    return NotFound("Result not found or still processing");
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new CodeExecutionResponse
-                {
-                    Output = "",
-                    Error = $"Internal Server Error: {ex.Message}",
-                    ExitCode = -1,
-                    Success = false
-                });
-            }
-        }
+        //[HttpGet("execute/testCases/{queueId}")]
+        //public async Task<ActionResult<TestSuiteExecutionResult>> GetTestCaseExecutionResult(Guid queueId)
+        //{
+        //    try
+        //    {
+        //        var result = await _testCaseExecutor.GetTestCaseExecutionResult(queueId);
+        //        if (result == null)
+        //        {
+        //            return NotFound("Result not found or still processing");
+        //        }
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new CodeExecutionResponse
+        //        {
+        //            Output = "",
+        //            Error = $"Internal Server Error: {ex.Message}",
+        //            ExitCode = -1,
+        //            Success = false
+        //        });
+        //    }
+        //}
     }
 }

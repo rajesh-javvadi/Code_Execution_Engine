@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddScoped<ICodeExecutor, DockerCodeExecutor>();
-builder.Services.AddScoped<ITestCaseExecutor, TestCaseExecutor>();
+builder.Services.AddScoped<ITestCasesExecutor, TestCasesExecutor>();
 builder.Services.AddScoped<TestCaseExecutionQueue>();
 builder.Services.AddScoped<TestCaseExecutionWorker>();
 
@@ -32,8 +32,8 @@ app.UseCors("AllowAll");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
 
 

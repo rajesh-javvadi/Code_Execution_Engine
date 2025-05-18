@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Copy input files
-if ! cp /app/main.py /runner/main.py; then
-  echo "{\"error\": \"/app/main.py not found\"}"
+if ! cp /app/main.js /runner/main.js; then
+  echo "{\"error\": \"/app/main.js not found\"}"
   exit 1
 fi
 
@@ -30,7 +29,12 @@ for (( i=0; i<$count; i++ )); do
     continue
   fi
 
-  output=$(echo "$input" | timeout 5s python3 /runner/main.py 2>&1 || true)
+  output=$(echo "$input" | timeout 5s node /runner/main.js 2>&1)
+  exit_code=$?
+
+  if [[ $exit_code -eq 124 ]]; then
+    output="Timeout after 5 seconds"
+  fi
 
   if [[ "$output" == "$expected" ]]; then
     ((pass_count++))
@@ -39,5 +43,4 @@ for (( i=0; i<$count; i++ )); do
   fi
 done
 
-# Output result as valid JSON
 echo "{\"passed\": $pass_count, \"failed\": $fail_count}"
