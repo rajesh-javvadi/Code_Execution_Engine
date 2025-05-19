@@ -54,13 +54,21 @@ namespace Code_Execution_Engine.Controllers
             }
             try
             {
-                List<TestCase> testCases = new List<TestCase>();
-                testCases.Add(new TestCase { Input = "1 5" ,ExpectedOutput = "6"});
-                testCases.Add(new TestCase { Input = "2 5", ExpectedOutput = "7" });
-                testCases.Add(new TestCase { Input = "3 5" ,ExpectedOutput = "8" });
-                testCases.Add(new TestCase { Input = "4 5" ,ExpectedOutput = "9" });
-                testCases.Add(new TestCase { Input = "5 5" ,ExpectedOutput = "10" });
-                testCases.Add(new TestCase { Input = "6 5" ,ExpectedOutput = "11"});
+                List<TestCase> testCases = new List<TestCase>
+{
+    new TestCase { Input = "1 2 3 4 5", ExpectedOutput = "5 4 3 2 1" },
+    new TestCase { Input = "1 2", ExpectedOutput = "2 1" },
+    new TestCase { Input = "1", ExpectedOutput = "1" },
+    new TestCase { Input = "10 20 30 40", ExpectedOutput = "40 30 20 10" },
+    new TestCase { Input = "7 7 7", ExpectedOutput = "7 7 7" },
+    new TestCase { Input = "5 4 3 2 1", ExpectedOutput = "1 2 3 4 5" },
+    new TestCase { Input = "100", ExpectedOutput = "100" },
+    new TestCase { Input = "0 0 0 0 0", ExpectedOutput = "0 0 0 0 0" },
+    new TestCase { Input = "9 8 7 6 5 4 3 2 1", ExpectedOutput = "1 2 3 4 5 6 7 8 9" }
+};
+
+
+
                 string json = JsonSerializer.Serialize(testCases, new JsonSerializerOptions { WriteIndented = true });
                 Console.WriteLine(json);
 
